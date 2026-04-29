@@ -1,0 +1,345 @@
+---
+title: "Take-Home Problems Week #2"
+author: Oscar Kai
+date: 2026-04-10
+format: html
+embed-resources: true
+toc: true
+toc-expand: true
+---
+
+# Take-home Problems
+
+# Problem 1
+
+Plug in an external hard-drive or USB into your computer. Manually, create a folder within called “TargetFolder”. Try to programmatically specify the file path to identify the folders and files present on your external drive. Then, try to copy your .fcs files from their current folder on your desktop to the TargetFolder on your drive using R. Remember, just copy, no deletion, you need to walk before you can run :D
+
+
+## Step 1 - Plug the external hard drive/USB
+
+
+Connect the external drive to the computer.
+Wait until the system mounts it. (My windows will all do this automatically).
+
+
+## Step 2- Manually create a folder called TargetFolder
+
+
+
+create this manually, not in R:
+
+Open the external drive normally (File Explorer on Windows).
+Create a new folder.
+Name it exactly: TargetFolder
+
+Example:
+
+On Windows shows : D:/
+
+So after creation, the target folder is something like:
+
+USB Drive (D):/TargetFolder
+
+
+## Step 3- Identify the file path programmatically in R
+
+
+
+```{r}
+#| eval: true
+
+#| code-fold: TRUE
+
+list.files("D:/")
+
+```
+
+
+![](Images/Screenshot%202026-04-09%20163646.png)
+
+
+## Step 4 - Identify the location of my .fcs file on my Laptop
+
+
+My Fcs files are stitting in
+
+[Project Folder](C:\Users\okai\Documents\R Project Folder\FCSfiles)
+
+If we currently listed the files within data, we get a return that looks like this:
+
+
+```{r}
+#| eval: true
+#| code-fold: TRUE
+
+laptop_path <- "C:/Users/okai/Documents/R Project Folder/FCSfiles"
+list.files(laptop_path)
+
+```
+
+
+![](Images/Screenshot%202026-04-09%20220843.png)
+
+
+```{r}
+
+#| eval: false
+#| code-fold: TRUE
+
+# confirm that these files exist in the laptop_path
+
+dir.exists(laptop_path)
+```
+
+
+![](Images/Screenshot%202026-04-09%20221103.png)
+
+
+## Step 5-Copy ALL .fcs files from your laptop folder to your USB drive (D:/TargetFolder)
+
+
+```{r}
+#| eval: false
+#| code-fold: TRUE
+
+# Source folder on your laptop
+
+laptop_path <- "C:/Users/okai/Documents/R Project Folder/FCSfiles"
+
+# Destination folder on your USB drive
+usb_path <- "D:/TargetFolder"
+
+# Copy ALL files from laptop to USB drive
+
+file.copy(
+  from = list.files(laptop_path, full.names = TRUE),
+  to = usb_path,
+  overwrite = TRUE
+)
+```
+
+![](images/Screenshot%202026-04-09%20221318.png)
+
+
+## Confirm What files were copied
+
+```{r}
+
+#| eval: false
+#| code-fold: TRUE
+
+list.files("D:/TargetFolder")
+```
+
+![](Images/Screenshot%202026-04-09%20221523.png)
+
+
+
+# Problem 2
+
+In this session, we used list.files() with the “full.names argument” set to TRUE, as well as the basename() function to identify specific files. But what if you wanted a particular directory. Run list.files() with “full.names argument” and “recursive” argument set to TRUE, and then search online to find an R function that would retrieve the “” individual directory folders.
+
+## 1. Use of list.files() with Full.names = TRUE and recursive = TRUE
+
+This returns all files AND folders in all subdirectories, but the output is paths to files, not the folders themselves.
+
+ for instance
+
+ 
+ ```{r}
+ all_paths <- list.files(
+  path = ".",       # or any directory
+  full.names = TRUE,
+  recursive = TRUE
+)
+
+all_paths
+ ```
+
+ ![](Images/Screenshot%202026-04-10%20005554.png)
+
+
+ ## 2. But if one only wanted the directory folders
+
+list.files() does not directly filter folders — it lists names.
+
+depending on what one wants
+
+
+```{r}
+# To extract only directories
+
+dirs <- unique(dirname(all_paths))
+dirs
+```
+
+
+![](Images/Screenshot%202026-04-10%20010725.png)
+
+
+
+## 3. R function that retrieves directory folders directly
+
+
+
+```{r}
+# The commonly used function for retrieving only directories
+
+# Unlike list.files(), list.dirs() returns only folders, not files.
+list.dirs()
+```
+
+
+![](Images/Screenshot%202026-04-10%20011721.png)
+
+or 
+
+```{r}
+folders <- list.dirs(path = ".", full.names = TRUE, recursive = TRUE)
+folders
+```
+
+
+![](Images/Screenshot%202026-04-10%20011920.png)
+
+
+for instance:
+
+
+```{r}
+list.dirs(path = "your/folder/here", full.names = TRUE, recursive = TRUE)
+```
+
+
+
+
+# Problem 3
+
+
+
+R packages often come with internal datasets, that are typically used for use in the help documentation examples. These can be accessed through the use of the system.file() function. See an example code below.
+
+
+
+```{r}
+
+# Using what we have learned about file.path navigation, search your way down the file.directory of the FlowSOM and flowWorkspace packages, and identify any .fcs files that are present for use in the documentation.
+
+system.file("extdata", package = "FlowSOM")
+
+```
+
+
+![](Images/Screenshot%202026-04-10%20012254.png)
+
+
+
+✅ Navigate inside the FlowSOM and flowWorkspace packages
+
+
+✅ Look for .fcs files (flow cytometry data files)
+
+
+✅ Identify which ones are shipped for documentation examples
+
+
+## ✅ 1. FlowSOM: Locate internal .fcs files
+
+
+### ✅ Step 1 — Get the directory
+
+
+```{r}
+flowSOM_path <- system.file("extdata", package = "FlowSOM")
+flowSOM_path
+
+```
+
+### ✅ Step 2 — Search recursively for .fcs files
+
+
+```{r}
+
+# This file is used in FlowSOM documentation examples
+
+# It is included specifically to demonstrate reading and building FlowSOM objects
+
+flowSOM_fcs <- list.files(
+  path = flowSOM_path,
+  pattern = "\\.fcs$",
+  full.names = TRUE,
+  recursive = TRUE
+)
+
+flowSOM_fcs
+
+```
+
+
+![](Images/Screenshot%202026-04-10%20013156.png)
+
+
+## ✅ 3. flowWorkspace: Locate internal .fcs files
+
+```{r}
+
+system.file("extdata", package = "flowWorkspace")
+
+```
+
+![](Images/Screenshot%202026-04-29%20110055.png)
+
+
+
+### ✅ Step 1 — Get the directory
+
+```{r}
+
+flowWorkspace_path <- system.file("extdata", package = "flowWorkspace") 
+flowWorkspace_path
+
+```
+
+![](Images/Screenshot%202026-04-29%20113117.png)
+
+
+### ✅ Step 2 — Search recursively for .fcs files
+
+```{r}
+
+# This file is used in flowWorkspace documentation examples
+
+# It is included specifically to demonstrate reading and building flowWorkspace objects
+
+flowWorkspace_fcs <- list.files(
+  path = flowWorkspace_path,
+  pattern = "\\.fcs$",
+  full.names = TRUE,
+  recursive = TRUE
+)
+
+flowWorkspace_fcs
+
+# returns character(0)
+
+# meaning Because flowWorkspace does NOT ship any .fcs files.
+
+# Important distinction
+
+# flowWorkspace focuses on workspace management (GatingSets, cytometry metadata)
+# It assumes FCS data already exist
+# Its documentation examples often reference workflows, not bundled raw FCS files
+
+```
+
+
+
+### ✅ Step 3 — Search recursively for what is in extdata
+
+```{r}
+
+list.files(flowWorkspace_path, recursive = TRUE, full.names = TRUE)
+
+```
+
+![](Images/Screenshot%202026-04-29%20113756.png)
