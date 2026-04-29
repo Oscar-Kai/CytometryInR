@@ -219,8 +219,8 @@ library(flowWorkspace)
 ```
 
 ```{r}
-StorageLocation <- file.path("course", "08_WaysToGate", "data") # When working interactively
-# StorageLocation <- file.path("data") # Quarto Render
+# StorageLocation <- file.path("course", "08_WaysToGate", "data") # When working interactively
+StorageLocation <- file.path("data") # Quarto Render
 ```
 
 ```{r}
